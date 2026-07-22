@@ -1,5 +1,14 @@
 local success, err = pcall(function()
-    print("[Nexus] Загрузка интерфейса V66 (Квесты раз в час)...")
+    -- 🔄 Авто-перезапуск скрипта при телепортации/реконнекте
+    local queueteleport = (queue_on_teleport or syn and syn.queue_on_teleport or fluxus and fluxus.queue_on_teleport)
+    if queueteleport then
+        queueteleport([[
+            task.wait(3)
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/blegbot1/YXA-UZ-YX/refs/heads/main/ScriptYX.lua"))()
+        ]])
+    end
+
+    print("[Nexus] Загрузка интерфейса V67 (Anti-AFK + Auto-Reconnect)...")
     local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
     
     local TweenService = game:GetService("TweenService")
@@ -7,11 +16,38 @@ local success, err = pcall(function()
     local ReplicatedStorage = game:GetService("ReplicatedStorage")
     local VirtualUser = game:GetService("VirtualUser")
     local VirtualInputManager = game:GetService("VirtualInputManager")
+    local TeleportService = game:GetService("TeleportService")
+    local CoreGui = game:GetService("CoreGui")
+
+    -- 🛡️ АВТО-РЕКОННЕКТ ПРИ КИКЕ ИЛИ ВЫЛЕТЕ СЕРВЕРА
+    pcall(function()
+        CoreGui.RobloxPromptGui.promptOverlay.ChildAdded:Connect(function(child)
+            if child.Name == "ErrorPrompt" then
+                task.spawn(function()
+                    while true do
+                        TeleportService:Teleport(game.PlaceId, Players.LocalPlayer)
+                        task.wait(2)
+                    end
+                end)
+            end
+        end)
+    end)
+
+    -- 🛡️ АНТИ-AFK (работает всегда)
+    task.spawn(function()
+        Players.LocalPlayer.Idled:Connect(function()
+            pcall(function()
+                VirtualUser:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+                task.wait(1)
+                VirtualUser:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+            end)
+        end)
+    end)
 
     local Window = Rayfield:CreateWindow({
-       Name = "Smart Farm & Fixes V66",
+       Name = "Smart Farm & Fixes V67",
        LoadingTitle = "Загрузка фармилки...",
-       LoadingSubtitle = "by gerkyles",
+       LoadingSubtitle = "by Nexus",
     })
 
     local autoFarm = false
@@ -77,14 +113,6 @@ local success, err = pcall(function()
                 end)
             end
             task.wait(5)
-        end
-    end)
-
-    Players.LocalPlayer.Idled:Connect(function()
-        if autoFarm then
-            VirtualUser:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
-            task.wait(1)
-            VirtualUser:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
         end
     end)
 
@@ -203,7 +231,7 @@ local success, err = pcall(function()
         return nil
     end
 
-    -- 🎯 НОВЫЙ ЦИКЛ КВЕСТОВ: СРАЗУ ВЫДАЧА, ПОТОМ СОН НА 1 ЧАС (3600 СЕКУНД)
+    -- Цикл квестов (раз в час)
     task.spawn(function()
         while true do
             if autoBountyQuest then
@@ -214,7 +242,6 @@ local success, err = pcall(function()
                     end)
                 end
                 
-                -- Ожидание ровно 1 час (3600 секунд), проверяя статус выключения
                 local elapsed = 0
                 while elapsed < 3600 and autoBountyQuest do
                     task.wait(1)
@@ -405,7 +432,7 @@ local success, err = pcall(function()
     })
 
     FarmTab:CreateToggle({
-        Name = "Авто-взятие квестов (Bounty)",
+        Name = "Авто-взятие квестов (раз в час)",
         CurrentValue = false,
         Callback = function(Value) autoBountyQuest = Value end,
     })
@@ -525,7 +552,7 @@ local success, err = pcall(function()
 end)
 
 if not err and success then
-    print("[Success] Скрипт V66 успешно загружен!")
+    print("[Success] Скрипт V67 успешно загружен!")
 else
-    warn("[Error] Ошибка загрузки V66: " .. tostring(err))
+    warn("[Error] Ошибка загрузки V67: " .. tostring(err))
 end
