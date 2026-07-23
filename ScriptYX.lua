@@ -1,14 +1,16 @@
 local success, err = pcall(function()
-    -- 🔄 Авто-перезапуск скрипта при телепортации/реконнекте
+    -- 🔄 Авто-перезапуск скрипта только при реконнекте в конкретную игру по ID
     local queueteleport = (queue_on_teleport or syn and syn.queue_on_teleport or fluxus and fluxus.queue_on_teleport)
     if queueteleport then
         queueteleport([[
-            task.wait(3)
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/blegbot1/YXA-UZ-YX/refs/heads/main/ScriptYX.lua"))()
+            if game.PlaceId == 121127868367976 then
+                task.wait(3)
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/blegbot1/YXA-UZ-YX/refs/heads/main/ScriptYX.lua"))()
+            end
         ]])
     end
 
-    print("[Nexus] Загрузка интерфейса V67 (Anti-AFK + Auto-Reconnect)...")
+    print("[Nexus] Загрузка интерфейса V69 (Жесткая привязка по ID плейса)...")
     local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
     
     local TweenService = game:GetService("TweenService")
@@ -45,7 +47,7 @@ local success, err = pcall(function()
     end)
 
     local Window = Rayfield:CreateWindow({
-       Name = "Smart Farm & Fixes V67",
+       Name = "Smart Farm & Fixes V69",
        LoadingTitle = "Загрузка фармилки...",
        LoadingSubtitle = "by Nexus",
     })
@@ -552,7 +554,7 @@ local success, err = pcall(function()
 end)
 
 if not err and success then
-    print("[Success] Скрипт V67 успешно загружен!")
+    print("[Success] Скрипт V69 успешно загружен!")
 else
-    warn("[Error] Ошибка загрузки V67: " .. tostring(err))
+    warn("[Error] Ошибка загрузки V69: " .. tostring(err))
 end
